@@ -65,10 +65,10 @@ var params = {
     entriesPerPage: 10
   },
 
-  // itemFilter: [
-  //   {name: 'FreeShippingOnly', value: true},
-  //   {name: 'MaxPrice', value: '150'}
-  // ],
+  itemFilter: [
+    {name: 'FreeShippingOnly', value: true},
+    {name: 'MaxPrice', value: '150'}
+  ],
 
   domainFilter: [
     {name: 'domainName', value: 'Digital_Cameras'}
