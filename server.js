@@ -77,48 +77,46 @@ app.listen(PORT, () => {
 // EBAY API
 ////////////////////////////////////////////////////////////////////////////////////////
 
-// var ebay = require('ebay-api');
+var ebay = require('ebay-api');
 
-// var params = {
-//   keywords: ["Stephen King"],
-
-
-//   outputSelector: ['AspectHistogram'],
-
-//   paginationInput: {
-//     entriesPerPage: 10
-//   },
+var params = {
+  keywords: ["Stephen King"],
+  outputSelector: ['AspectHistogram'],
+  paginationInput: {
+    entriesPerPage: 10
+  },
 
 //   // itemFilter: [
 //   //   {name: 'FreeShippingOnly', value: true},
 //   //   {name: 'MaxPrice', value: '150'}
 //   // ],
 
-//   domainFilter: [
-//     {name: 'domainName', value: 'Digital_Cameras'}
-//   ]
-// };
-// console.log(process.env.THIERRY_EBAY_KEY)
-// ebay.xmlRequest({
-//     serviceName: 'Finding',
-//     opType: 'findItemsByKeywords',
-//     appId: process.env.THIERRY_EBAY_KEY,
-//     params: params,
-//     parser: ebay.parseResponseJson    // (default)
-//   },
-//   // gets all the items together in a merged array
-//   function itemsCallback(error, itemsResponse) {
-//     if (error) throw error;
 
-//     var items = itemsResponse.searchResult.item;
+  domainFilter: [
+    {name: 'domainName', value: 'Digital_Cameras'}
+  ]
+};
+console.log(process.env.THIERRY_EBAY_KEY)
+ebay.xmlRequest({
+    serviceName: 'Finding',
+    opType: 'findItemsByKeywords',
+    appId: process.env.THIERRY_EBAY_KEY,
+    params: params,
+    parser: ebay.parseResponseJson    // (default)
+  },
+  // gets all the items together in a merged array
+  function itemsCallback(error, itemsResponse) {
+    if (error) throw error;
 
-//     console.log('Found', items.length, 'items');
+    var items = itemsResponse.searchResult.item;
 
-//     for (var i = 0; i < items.length; i++) {
-//       console.log('- ' + items[i].title);
-//     }
-//   }
-// );
+    console.log('Found', items.length, 'items');
+
+    for (var i = 0; i < items.length; i++) {
+      console.log('- ' + items[i].title);
+    }
+  }
+);
 
 
 
