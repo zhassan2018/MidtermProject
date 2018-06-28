@@ -37,6 +37,17 @@ app.use(express.static("public"));
 // Mount all resource routes
 app.use("/api/users", usersRoutes(knex));
 
+
+//API modules
+var ebay = require('ebay-api');
+
+const yelp = require('yelp-fusion');
+
+const fetch = require('node-fetch')
+
+
+
+
 // Home page
 var toShow = {'first':''};
 app.get("/", (req, res) => {
@@ -63,14 +74,10 @@ app.listen(PORT, () => {
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////
 // EBAY API
-////////////////////////////////////////////////////////////////////////////////////////
-
-var ebay = require('ebay-api');
 
 var params = {
-  keywords: ["Stephen King"],
+  keywords: ["fjdkslfjdsklfjdl"],
   outputSelector: ['AspectHistogram'],
   paginationInput: {
     entriesPerPage: 10
@@ -90,6 +97,7 @@ var params = {
     {name: 'domainName', value: 'Digital_Cameras'}
   ]
 };
+
 console.log(process.env.THIERRY_EBAY_KEY)
 ebay.xmlRequest({
     serviceName: 'Finding',
@@ -100,9 +108,17 @@ ebay.xmlRequest({
   },
   // gets all the items together in a merged array
   function itemsCallback(error, itemsResponse) {
-    if (error) throw error;
+    if (error) throw console.log(error);
+
 
     var items = itemsResponse.searchResult.item;
+
+    if (items === undefined){
+      return console.log("Could not find item:",params.keywords,"on EBAY");
+
+    }
+
+
 
     console.log('Found', items.length, 'items');
 
@@ -113,27 +129,51 @@ ebay.xmlRequest({
 );
 
 
-/////////////////////////////////////////////////////////////////////////////////////
-// YELP API
-/////////////////////////////////////////////////////////////////////////////////////
-
-const yelp = require('yelp-fusion');
+//YELP API
 
 const client = yelp.client(process.env.YELP_API_KEY);
+var food = "hamburger"
 
 client.search({
-  term:'beef',
+  term:food,
   location: 'montreal, qc',
   sort_by: 'rating',
   limit: 20,
   price: [2,1]
 }).then(response => {
-  console.log(response.jsonBody.businesses.length);
+  if(response.statusCode !== 200){
+    return console.log("Didnt find a restaurant for", food )
+  }
+
+if(response.jsonBody.businesses.length === 0){
+  return console.log("Didnt find a restaurant for", food )
+}
   for(var i = 0; i<response.jsonBody.businesses.length;i++){
     console.log(response.jsonBody.businesses[i].name);
   }
-}).catch(e => {
-  console.log(e);
-});
+})
+
+
+//Movies/TV API
+
+
+fetch(`http://www.omdbapi.com/?apikey=${process.env.MOVIES_API}&t=jfldkjfld`)
+    .then(res => res.json())
+    .then((json) => {
+      if (json.Response === 'False'){
+        return console.log(json.Error)
+      }
+      console.log(json)})
+
+
+fetch( `https://www.googleapis.com/books/v1/volumes?q=dsfkjsdkfljd&maxResults=1&projection=lite&key=${process.env.BOOKS_API}`).then(res => res.json()).then((json) => {
+      if (json.totalItems === 0){
+        return console.log('book not found!')
+      }
+
+      console.log(json.items[0].volumeInfo.title)
+    })
+
+
 
 

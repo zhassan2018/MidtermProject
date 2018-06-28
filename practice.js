@@ -19,14 +19,20 @@ console.log(content)
 xmlhttp.send();*/
 
 //this is a string we cant use this
+const ENV         = process.env.ENV || "development";
 const fetch = require('node-fetch')
-
-fetch('http://www.omdbapi.com/?apikey=4cf6233d&t=collateral')
-    .then(res => {res.json()})
-    .then((json) => {
+console.log(process.env.BOOKS_API)
+fetch(`https://www.googleapis.com/books/v1/volumes?q=harry+potter&key=${process.env.BOOKS_API}`
+).then(res => res.json()).then((json) => {
       console.log(typeof json)
 
-      console.log(json)})
+      console.log(json.items)})
+
+
+
+
+
+
 
 
 
