@@ -39,9 +39,40 @@ app.use(express.static("public"));
 app.use("/api/users", usersRoutes(knex));
 
 // Home page
+var toShow = {'first':''};
 app.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", toShow);
 });
+
+
+
+app.post("/userInput", (req, res) =>{
+  var uRequest = req.body['userData'];
+  toShow['first'] = uRequest
+var url = `http://www.omdbapi.com/?apikey=4cf6233d&t=${uRequest}`
+
+
+var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+var xmlhttp = new XMLHttpRequest();
+
+xmlhttp.open('GET', 'http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json', true);
+xmlhttp.onload = function () {
+  var x = xmlhttp.response;
+
+console.log("got here")
+console.log(JSON.parse(x))
+  // Begin accessing JSON data here
+
+
+}
+
+xmlhttp.send();
+
+
+ res.render("index", toShow)
+  res.redirect('/')
+
+})
 
 app.listen(PORT, () => {
   console.log("Example app listening on port " + PORT);
