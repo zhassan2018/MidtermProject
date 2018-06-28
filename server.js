@@ -60,10 +60,7 @@ var ebay = require('ebay-api');
 
 var params = {
   keywords: ["Stephen King"],
-
-
   outputSelector: ['AspectHistogram'],
-
   paginationInput: {
     entriesPerPage: 10
   },
