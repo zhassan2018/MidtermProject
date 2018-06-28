@@ -20,14 +20,11 @@ xmlhttp.send();*/
 
 //this is a string we cant use this
 
-"use strict";
 
 require('dotenv').config();
 
 const ENV         = process.env.ENV || "development";
 
-const bodyParser  = require("body-parser");
-const sass        = require("node-sass-middleware");
 
 
 
