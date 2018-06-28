@@ -14,12 +14,14 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "dotenv": "^2.0.0",
+    "ebay-api": "^1.13.7",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
     "fetch": "^1.1.0",
     "knex": "^0.11.7",
     "knex-logger": "^0.1.0",
     "morgan": "^1.7.0",
+<<<<<<< HEAD
     "node-fetch": "^2.1.2",
     "node-sass-middleware": "^0.9.8",
     "pg": "^6.0.2",
@@ -27,5 +29,13 @@
   },
   "devDependencies": {
     "nodemon": "^1.17.5"
+=======
+    "node-sass-middleware": "^0.11.0",
+    "pg": "^6.0.2",
+    "yelp-fusion": "^2.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.9.2"
+>>>>>>> 95f95aba2e74cf7d73c89b9a2015d650991f5829
   }
 }
