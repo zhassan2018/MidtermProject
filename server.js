@@ -6,6 +6,7 @@ const PORT        = process.env.PORT || 8080;
 const ENV         = process.env.ENV || "development";
 const express     = require("express");
 const bodyParser  = require("body-parser");
+
 const sass        = require("node-sass-middleware");
 const app         = express();
 
@@ -17,24 +18,37 @@ const knexLogger  = require('knex-logger');
 // Seperated Routes for each Resource
 const usersRoutes = require("./routes/users");
 
-const yelp = require('yelp-fusion');
+const session     = require("express-session");
 
-const client = yelp.client(process.env.YELP_API_KEY);
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {maxAge: 60000}
+  //store: connect to storesession in database?
+}));
 
-client.search({
-  term:'beef',
-  location: 'montreal, qc',
-  sort_by: 'rating',
-  limit: 20,
-  price: [2,1]
-}).then(response => {
-  console.log(response.jsonBody.businesses.length);
-  for(var i = 0; i<response.jsonBody.businesses.length;i++){
-    console.log(response.jsonBody.businesses[i].name);
-  }
-}).catch(e => {
-  console.log(e);
-});
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({extended: true}));
+
+// const yelp = require('yelp-fusion');
+
+// const client = yelp.client(process.env.YELP_API_KEY);
+
+// client.search({
+//   term:'mandys',
+//   location: 'montreal, qc',
+//   sort_by: 'rating',
+//   limit: 20,
+//   price: [2,1]
+// }).then(response => {
+//   console.log(response.jsonBody.businesses.length);
+//   for(var i = 0; i<response.jsonBody.businesses.length;i++){
+//     console.log(response.jsonBody.businesses[i].name);
+//   }
+// }).catch(e => {
+//   console.log(e);
+// });
 
 /**
  * example eBay API request to FindingService:findItemsByKeywords
@@ -61,14 +75,172 @@ app.use(express.static("public"));
 // Mount all resource routes
 app.use("/api/users", usersRoutes(knex));
 
+
+//in-memory database storing user data -- just for testing purposes
+const usersDatabase =  {
+  'user1': {
+    id: 'user1',
+    email: 'tiffanyjdow@gmail.com',
+    password: 'tomato'
+  },
+  'user2': {
+    id: 'user2',
+    email: 'jeesanlee@gmail.com',
+    password: 'elmo'
+  },
+  'user3': {
+    id: 'user3',
+    email: 'elmo_party@gmail.com',
+    password: 'brick'
+  }
+};
+
+//// FUNCTIONS /////
+
+//function to verify if a user has an account
+const verifyUser = (email, password) => {
+  for (let users in usersDatabase) {
+    if (usersDatabase[users].email === email) {
+      if (usersDatabase[users].password === password) {
+        return usersDatabase[users];
+      }
+    }
+  }
+  return false;
+};
+
 // Home page
 app.get("/", (req, res) => {
-  res.render("index");
+
+  let verifiedUser = req.session.user_id;
+
+
+  if (verifiedUser) {
+  res.status(200).render("index");
+} else {
+  res.status(301).redirect("login");
+}
+});
+
+app.get("/login", (req, res) => {
+
+  res.status(200).render("login");
+  //login page has 2 options - register as a new user OR login to an existing account
+});
+
+app.post("/login", (req, res) => {
+
+  let email = req.body.email;
+  let password = req.body.password;
+  let verifiedUser = verifyUser(req.body.email, req.body.password);
+
+  // if (verifiedUser) {
+  //   req.session.user_id = verifiedUser.id;
+  //   res.status(301).redirect("/");
+  //  } else {
+  //   res.status(401).send('There was an error with your login credentials, please try again');
+  // }
+
+  knex("users")
+    .where("email", req.body.email)
+    .then(user => {
+      if (user) {
+        bcrypt.compareSync(req.body.password, user.password);
+        req.session.user_id = users.id;
+        res.status(301).redirect("/");
+      } else {
+    res.status(401).send('There was an error with your login credentials, please try again');
+  }
+    });
+
+//   app.post("/login", (req, res) => {
+//   knex
+//     .from("users")
+//     .then(result => {
+//       for (let user of result) {
+//         if (user.password !== req.body.Logpassword) {
+//           console.log("not you", user);
+//         } else if (user.email !== req.body.Logemail) {
+//           console.log("wrong email");
+//         } else if (
+//           user.password === req.body.Logpassword &&
+//           user.email === req.body.Logemail
+//         ) {
+//           req.session.user = req.body.Logemail;
+//           res.redirect("/smart");
+//         }
+//       }
+//     })
+//     .catch(err => console.log("login db error.", err));
+// });
+});
+
+app.post("/register", (req, res) => {
+
+  let email = req.body.email;
+  let password = req.body.password;
+
+  if (email === "" || password === "") {
+    res.status(401).send('Please fill in your email and password to continue');
+  } else {
+
+    for (let user in usersDatabase) {
+      if (email === usersDatabase[user].email) {
+        res.staus(400).send('User already exists, please try again');
+      } else {
+        req.session.user_id = usersDatabase[user].id;
+        res.status(301).redirect("/");
+      }
+    }
+  }
+
+  knex("users")
+    .insert({
+      email: email,
+      password: password
+    })
+    .returning("id")
+    .then(id => {
+      req.session.user_id = id;
+    });
+    res.status(301).redirect("/");
+
+  //REGISTER: users can sign up as a user on the site
+  //send error if they don't enter an email and/or password
+});
+
+app.get("/profile", (req, res) => {
+
+  res.status(200).render("profile");
+});
+
+app.post("/profile/:id", (req, res) => {
+
+  let updatedEmail = req.body.email;
+  let updatedPassword = req.body.password;
+
+  if (updatedEmail !== "" || updatedPassword !== "") {
+    //insert upDated email into users email in database
+  }
+
+  //allows users to edit their account information (username, email, password)
+  //or the option to delete their account
+});
+
+app.post("/profile/:id/delete", (req, res) => {
+  //gives users the ability to delete their account
+});
+
+app.post("/logout", (req, res) => {
+  //users are able to logout from the site
+  req.session.user_id = null;
+  res.status(301).redirect('/');
 });
 
 app.listen(PORT, () => {
-  console.log("Example app listening on port " + PORT);
+  console.log(`Example app listening on port ${PORT}!`);
 });
+
 
 
 
@@ -77,46 +249,46 @@ app.listen(PORT, () => {
 // EBAY API
 ////////////////////////////////////////////////////////////////////////////////////////
 
-var ebay = require('ebay-api');
+// var ebay = require('ebay-api');
 
-var params = {
-  keywords: ["Stephen King"],
-  outputSelector: ['AspectHistogram'],
-  paginationInput: {
-    entriesPerPage: 10
-  },
+// var params = {
+//   keywords: ["Stephen King"],
+//   outputSelector: ['AspectHistogram'],
+//   paginationInput: {
+//     entriesPerPage: 10
+//   },
 
-//   // itemFilter: [
-//   //   {name: 'FreeShippingOnly', value: true},
-//   //   {name: 'MaxPrice', value: '150'}
-//   // ],
+  // itemFilter: [
+  //   {name: 'FreeShippingOnly', value: true},
+  //   {name: 'MaxPrice', value: '150'}
+  // ],
 
 
-  domainFilter: [
-    {name: 'domainName', value: 'Digital_Cameras'}
-  ]
-};
-console.log(process.env.THIERRY_EBAY_KEY)
-ebay.xmlRequest({
-    serviceName: 'Finding',
-    opType: 'findItemsByKeywords',
-    appId: process.env.THIERRY_EBAY_KEY,
-    params: params,
-    parser: ebay.parseResponseJson    // (default)
-  },
-  // gets all the items together in a merged array
-  function itemsCallback(error, itemsResponse) {
-    if (error) throw error;
+//   domainFilter: [
+//     {name: 'domainName', value: 'Digital_Cameras'}
+//   ]
+// };
+// console.log(process.env.THIERRY_EBAY_KEY)
+// ebay.xmlRequest({
+//     serviceName: 'Finding',
+//     opType: 'findItemsByKeywords',
+//     appId: process.env.THIERRY_EBAY_KEY,
+//     params: params,
+//     parser: ebay.parseResponseJson    // (default)
+//   },
+//   // gets all the items together in a merged array
+//   function itemsCallback(error, itemsResponse) {
+//     if (error) throw error;
 
-    var items = itemsResponse.searchResult.item;
+//     var items = itemsResponse.searchResult.item;
 
-    console.log('Found', items.length, 'items');
+//     console.log('Found', items.length, 'items');
 
-    for (var i = 0; i < items.length; i++) {
-      console.log('- ' + items[i].title);
-    }
-  }
-);
+//     for (var i = 0; i < items.length; i++) {
+//       console.log('- ' + items[i].title);
+//     }
+//   }
+// );
 
 
 
