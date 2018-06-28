@@ -109,6 +109,6 @@ var ebayAPI = (uRequest) => {
   );
 }
 
-
+module.exports = {MovieAPI, BookAPI, yelpAPI, ebayAPI};
 
 
