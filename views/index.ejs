@@ -12,6 +12,7 @@
   </head>
 
   <body>
+
     <header>
       <form method="GET" action="/profile">
         <button name="profile" type = "submit">PROFILE</button>
@@ -26,5 +27,29 @@
           <button name="logout" type = "submit">LOGOUT</button>
         </form>
     </footer>
+
+
+    <h1>Hello World!</h1>
+    <p>
+      <form action="/userInput" method="POST">
+      <input id ="city" value="London" name ="userData"></input>
+      </form>
+
+      <% if (first === ''){%>
+      <%= first%>
+
+
+    <%}
+    else{%>
+    <%first%>
+
+    <%= first%>
+    something to show
+
+     <%} %>
+
+    </p>
+
+
   </body>
 </html>
