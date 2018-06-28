@@ -1,5 +1,5 @@
 exports.seed = function(knex, Promise) {
-  return knex('users').del()
+  return knex('users').del() // google search
     .then(function () {
       return Promise.all([
         knex('users').insert({id: 1, name: 'Alice'}),
