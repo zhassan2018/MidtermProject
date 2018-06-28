@@ -17,6 +17,7 @@
     "ebay-api": "^1.13.7",
     "ejs": "^2.4.1",
     "express": "^4.13.4",
+    "express-session": "^1.15.6",
     "fetch": "^1.1.0",
     "knex": "^0.11.7",
     "knex-logger": "^0.1.0",
