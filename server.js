@@ -17,6 +17,28 @@ const knexLogger  = require('knex-logger');
 // Seperated Routes for each Resource
 const usersRoutes = require("./routes/users");
 
+const yelp = require('yelp-fusion');
+
+const client = yelp.client(process.env.YELP_API_KEY);
+
+client.search({
+  term:'beef',
+  location: 'montreal, qc',
+  sort_by: 'rating',
+  limit: 20,
+  price: [2,1]
+}).then(response => {
+  console.log(response.jsonBody.businesses.length);
+  for(var i = 0; i<response.jsonBody.businesses.length;i++){
+    console.log(response.jsonBody.businesses[i].name);
+  }
+}).catch(e => {
+  console.log(e);
+});
+
+/**
+ * example eBay API request to FindingService:findItemsByKeywords
+ */
 
 // Load the logger first so all (static) HTTP requests are logged to STDOUT
 // 'dev' = Concise output colored by response status for development use.
@@ -55,7 +77,6 @@ app.listen(PORT, () => {
 // EBAY API
 ////////////////////////////////////////////////////////////////////////////////////////
 
-
 var ebay = require('ebay-api');
 
 var params = {
@@ -64,6 +85,11 @@ var params = {
   paginationInput: {
     entriesPerPage: 10
   },
+
+  itemFilter: [
+    {name: 'FreeShippingOnly', value: true},
+    {name: 'MaxPrice', value: '150'}
+  ],
 
   itemFilter: [
     {name: 'FreeShippingOnly', value: true},
