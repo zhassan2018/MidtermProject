@@ -20,10 +20,12 @@
     "fetch": "^1.1.0",
     "knex": "^0.11.7",
     "knex-logger": "^0.1.0",
+    "lodash": "^4.17.10",
     "morgan": "^1.7.0",
     "node-fetch": "^2.1.2",
     "node-sass-middleware": "^0.11.0",
     "pg": "^6.0.2",
+    "regex": "^0.1.1",
     "xmlhttprequest": "^1.8.0",
     "yelp-fusion": "^2.0.3"
   },

@@ -18,27 +18,51 @@ console.log(content)
 
 xmlhttp.send();*/
 
-//this is a string we cant use this
+var keyword = {'to_watch': ['watch', 'view', 'attend', 'see'],
+'to_read': ['read', 'interpret','study'],
+'to_buy':['buy', 'purchase', 'get', 'acquire'],
+'to_eat': ['eat', 'gorge','devour','dine','lunch','breakfast','dinner'] }
+
+var text = "eat big ass hamburgers";
+
+var _ = require('lodash');
+var res = text.split(" ");
+
+var toRemove = '';
+var category ='';
+var AddToCat = '';
 
 
-require('dotenv').config();
+for (cat in keyword){
 
-const ENV         = process.env.ENV || "development";
+  var current = keyword[cat];
+  for (var i =0; i < current.length; i++){
+    if (_.some(res, _.method('includes',current[i])) === true){
+      toRemove = current[i];
+      category = cat;
+
+    }
+
+  }
+}
+
+
+var index = _.remove(res, function(input){
+  return input !== toRemove;
+})
+
+AddToCat = index.join(' ')
+
+console.log(category);
+console.log(AddToCat)
+
+
+//Next we'll have a bunch of if statement to determine where to
+//add the
 
 
 
-
-// Seperated Routes for each Resource
-
-
-const fetch = require('node-fetch')
-console.log(process.env.BOOKS_API)
-fetch(`https://www.googleapis.com/books/v1/volumes?q=harry+potter&key=${process.env.BOOKS_API}`
-).then(res => res.json()).then((json) => {
-      console.log(typeof json)
-
-      console.log(json.items)})
-
+//The plan now is to still go through all the api but if there are multiple results, use
 
 
 

@@ -14,7 +14,7 @@ const knex        = require("knex")(knexConfig[ENV]);
 const morgan      = require('morgan');
 const knexLogger  = require('knex-logger');
 
-const apiFunctions = require('./apiFunctions')
+const apiFunc = require('./apiFunctions')
 
 // Seperated Routes for each Resource
 const usersRoutes = require("./routes/users");
@@ -56,10 +56,12 @@ app.post("/userInput", (req, res) =>{
   var uRequest = req.body['userData'];
   toShow['first'] = uRequest
 
-  apiFunctions.MovieAPI(uRequest);
-  apiFunctions.BookAPI(uRequest);
-  apiFunctions.yelpAPI(uRequest);
-  apiFunctions.ebayAPI(uRequest)
+
+
+  console.log(apiFunc.MovieAPI(uRequest));
+  console.log(apiFunc.BookAPI(uRequest));
+  console.log(apiFunc.yelpAPI(uRequest));
+  console.log(apiFunc.ebayAPI(uRequest))
 
 
   res.redirect('/')
@@ -70,6 +72,17 @@ app.listen(PORT, () => {
   console.log("Example app listening on port " + PORT);
 });
 
+
+
+
+//const keyword = "Abraham";
+
+//const regex = new RegEx(keyword, 'gi')
+
+// text.match(regex);
+
+
+//The plan now is to still go through all the api but if there are multiple results, use
 
 
 
